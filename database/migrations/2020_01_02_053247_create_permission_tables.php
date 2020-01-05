@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use App\User;
 
 class CreatePermissionTables extends Migration
 {
@@ -82,6 +85,20 @@ class CreatePermissionTables extends Migration
         app('cache')
             ->store(config('permission.cache.store') != 'default' ? config('permission.cache.store') : null)
             ->forget(config('permission.cache.key'));
+
+        $user = User::create(
+            [
+                'name' => 'codex',
+                'email' => 'info@codexmyanmar.com',
+                'email_verified_at' => now(),
+                'password' => Hash::make('password'), // password
+                'remember_token' => Str::random(10),
+            ]
+        );
+        
+        Role::create(['name' => "Admin"]);
+        $role_user = Role::where('name', '=', 'Admin')->firstOrFail();
+        $user->roles()->attach($role_user);
     }
 
     /**
